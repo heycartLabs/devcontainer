@@ -1,12 +1,12 @@
 ARG PHP_VERSION=8.2
 
 FROM --platform=$BUILDPLATFORM heycart-cli AS creation
-ARG SHOPWARE_VERSION=6.6.3.0
+ARG HEYCART_VERSION=6.6.3.0
 
 RUN <<EOF
     set -e
     export COMPOSER_ALLOW_SUPERUSER=1
-    heycart-cli project create /shop ${SHOPWARE_VERSION}
+    heycart-cli project create /shop ${HEYCART_VERSION}
     heycart-cli project ci /shop
     composer -d /shop require heycart/dev-tools
 EOF
@@ -31,9 +31,9 @@ FROM --platform=$BUILDPLATFORM base AS setup
 
 COPY --from=creation --chown=www-data /shop /var/www/html
 
-ARG SHOPWARE_VERSION=6.6.3.0
+ARG HEYCART_VERSION=6.6.3.0
 
-RUN --mount=type=cache,id=sqldump=${SHOPWARE_VERSION},sharing=locked,target=/var/cache/sql <<EOF
+RUN --mount=type=cache,id=sqldump=${HEYCART_VERSION},sharing=locked,target=/var/cache/sql <<EOF
     set -eo pipefail
     /usr/bin/mariadbd --basedir=/usr --datadir=/var/lib/mariadb --plugin-dir=/usr/lib/mariadb/plugin --user=www-data --skip-networking &
     until mariadb-admin -hlocalhost ping; do sleep 1; done
@@ -59,9 +59,9 @@ COPY --from=heycart-cli /usr/local/bin/heycart-cli /usr/local/bin/heycart-cli
 
 COPY --from=setup /var/www/html /var/www/html
 
-ARG SHOPWARE_VERSION=6.6.3.0
+ARG HEYCART_VERSION=6.6.3.0
 
-RUN --mount=type=cache,id=sqldump=${SHOPWARE_VERSION},sharing=locked,target=/var/cache/sql <<EOF
+RUN --mount=type=cache,id=sqldump=${HEYCART_VERSION},sharing=locked,target=/var/cache/sql <<EOF
     set -eo pipefail
     /usr/bin/mariadbd --basedir=/usr --datadir=/var/lib/mariadb --plugin-dir=/usr/lib/mariadb/plugin --user=www-data --skip-networking &
     until mariadb-admin -hlocalhost ping; do sleep 1; done

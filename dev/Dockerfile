@@ -1,17 +1,17 @@
 ARG PHP_VERSION=8.2
 
 FROM --platform=$BUILDPLATFORM heycart-cli AS creation
-ARG SHOPWARE_VERSION=6.5.8.12
+ARG HEYCART_VERSION=6.5.8.12
 
 RUN <<EOF
     set -e
 
     apk add --no-cache bash jq
 
-    git clone -q https://github.com/heycart/heycart.git -b v$SHOPWARE_VERSION --depth=1 /shop
+    git clone -q https://github.com/heycart/heycart.git -b v$HEYCART_VERSION --depth=1 /shop
     cd /shop
     rm -rf .github .git
-    composer config version $SHOPWARE_VERSION
+    composer config version $HEYCART_VERSION
 
     if ! jq -e '.["require-dev"]["phpstan/phpdoc-parser"]' composer.json > /dev/null 2>&1; then
         echo "phpstan/phpdoc-parser not found in require-dev, adding it..."
@@ -52,11 +52,11 @@ EOF
 
 FROM --platform=$BUILDPLATFORM base AS setup
 
-ARG SHOPWARE_VERSION=6.5.8.12
+ARG HEYCART_VERSION=6.5.8.12
 
 COPY --from=creation --chown=www-data /shop /var/www/html
 
-RUN --mount=type=cache,id=sqldump-dev=${SHOPWARE_VERSION},sharing=locked,target=/var/cache/sql <<EOF
+RUN --mount=type=cache,id=sqldump-dev=${HEYCART_VERSION},sharing=locked,target=/var/cache/sql <<EOF
     set -e
     /usr/bin/mariadbd --basedir=/usr --datadir=/var/lib/mariadb --plugin-dir=/usr/lib/mariadb/plugin --user=www-data --skip-networking &
     until mariadb-admin -hlocalhost ping; do sleep 1; done
@@ -81,9 +81,9 @@ FROM base
 COPY --from=heycart/heycart-cli /usr/local/bin/heycart-cli /usr/local/bin/heycart-cli
 COPY --from=setup /var/www/html /var/www/html
 
-ARG SHOPWARE_VERSION=6.5.8.12
+ARG HEYCART_VERSION=6.5.8.12
 
-RUN --mount=type=cache,id=sqldump-dev=${SHOPWARE_VERSION},sharing=locked,target=/var/cache/sql <<EOF
+RUN --mount=type=cache,id=sqldump-dev=${HEYCART_VERSION},sharing=locked,target=/var/cache/sql <<EOF
     set -eo pipefail
     /usr/bin/mariadbd --basedir=/usr --datadir=/var/lib/mariadb --plugin-dir=/usr/lib/mariadb/plugin --user=www-data --skip-networking &
     until mariadb-admin  -hlocalhost ping; do sleep 1; done

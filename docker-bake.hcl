@@ -42,7 +42,7 @@ target "base-full" {
 target "symfony-flex" {
     args = {
         PHP_VERSION = currentPHPVersion
-        SHOPWARE_VERSION = currentHeyCartVersion
+        HEYCART_VERSION = currentHeyCartVersion
     }
     contexts = {
         base = "docker-image://${image}/base-full:${currentPHPVersion}"
@@ -56,7 +56,7 @@ target "symfony-flex" {
 target "dev" {
     args = {
         PHP_VERSION = currentPHPVersion
-        SHOPWARE_VERSION = currentHeyCartVersion
+        HEYCART_VERSION = currentHeyCartVersion
     }
     contexts = {
         base = "docker-image://${image}/base-full:${currentPHPVersion}"

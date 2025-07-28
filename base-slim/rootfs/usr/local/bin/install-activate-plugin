@@ -39,7 +39,7 @@ folderName=$(jq -r .name "${project_dir}/composer.json" | sed 's/\/t/T/' | sed '
 
 if [[ $type == "heycart-platform-plugin" ]]; then
     cd /var/www/html
-    SHOPWARE_PROJECT_ROOT=/var/www/html/ heycart-cli extension build "/var/www/html/custom/plugins/${folderName}"
+    HEYCART_PROJECT_ROOT=/var/www/html/ heycart-cli extension build "/var/www/html/custom/plugins/${folderName}"
     composer require "${name}"
     php bin/console plugin:refresh
     list_with_updates=$(php bin/console plugin:list --json | jq 'map(select(.installedAt == null)) | .[].name' -r)

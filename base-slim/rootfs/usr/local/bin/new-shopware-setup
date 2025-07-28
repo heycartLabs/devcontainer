@@ -9,10 +9,10 @@ fi
 
 cd /var/www/html
 
-SHOPWARE_VERSION=${1:-*}
+HEYCART_VERSION=${1:-*}
 
 echo "Creating HeyCart project..."
-(composer create-project heycart/production:$SHOPWARE_VERSION . --no-interaction --prefer-dist --no-progress > /tmp/install.log 2>&1) || { echo "Installation failed. Log:"; cat /tmp/install.log; exit 1; }
+(composer create-project heycart/production:$HEYCART_VERSION . --no-interaction --prefer-dist --no-progress > /tmp/install.log 2>&1) || { echo "Installation failed. Log:"; cat /tmp/install.log; exit 1; }
 
 echo "Adding developer tools..."
 (composer require heycart/docker-dev --no-interaction > /tmp/install.log 2>&1) || { echo "Adding docker-dev failed. Log:"; cat /tmp/install.log; exit 1; }
